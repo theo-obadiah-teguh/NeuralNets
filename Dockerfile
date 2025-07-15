@@ -12,12 +12,7 @@ COPY requirements.txt /
 # (https://stackoverflow.com/questions/45594707/what-is-pips-no-cache-dir-good-for)
 RUN pip install --no-cache-dir -r requirements.txt jupyterlab
 
-# Create a directory of all notebooks
-RUN mkdir notebooks
-
-# Move all notebooks from localhost to the image
-COPY /notebooks/* /notebooks
-
+# Note: We don't need to copy everything from notebooks, as we use bind mounts
 # Expose the JupyterLab port
 EXPOSE 8888
 
