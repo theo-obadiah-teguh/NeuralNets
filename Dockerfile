@@ -4,7 +4,7 @@ FROM python:latest
 # Create a folder of notebooks
 WORKDIR /
 
-# Move the dependencies to the root folder
+# Move the dependencies to the container
 COPY requirements.txt /
 
 # Run this before you copy notebooks, to use the layer caching system
