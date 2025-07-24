@@ -4,8 +4,8 @@ FROM python:latest
 # Create a folder of notebooks
 WORKDIR /
 
-# Move the dependencies to the container
-COPY requirements.txt /
+# Move the dependencies to the root folder
+COPY requirements.txt /requirements.txt
 
 # Run this before you copy notebooks, to use the layer caching system
 # Note: Cached installation is not needed for Docker 
