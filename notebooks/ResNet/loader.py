@@ -3,11 +3,12 @@ from torchvision import datasets
 from torch.utils.data import DataLoader
 
 class CIFAR10DataLoader():
-    def __init__(self, batch_size=128):
+    def __init__(self, batch_size, num_workers):
         """
         This method creates a DataLoader class and defines the transformations.
         """
         self.batch_size = batch_size # Optional instance variable for training batch size
+        self.num_workers = num_workers # Optional instance variable for number of workers in each loader
         
         # Not in the original ResNet paper: standard ImageNet normalization
         self.normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], # These values represent RGB channels
@@ -51,13 +52,13 @@ class CIFAR10DataLoader():
         Without shuffling, the model would see the training samples in the exact same order in every epoch.
         Shuffling ensures that each batch in each epoch contains a random subset of the training data.
         """
-        return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True)
+        return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers, pin_memory=True)
 
     def get_valid_loader(self):
         """
         Returns a training set dataloader. Shuffling is not used to allow reproducibility of performance metrics.
         """
-        return DataLoader(self.valid_dataset, batch_size=128, shuffle=False)
+        return DataLoader(self.valid_dataset, batch_size=128, shuffle=False, num_workers=self.num_workers, pin_memory=True)
 
     def get_loaders(self):
         """

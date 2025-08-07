@@ -2,7 +2,7 @@ import torch
 import utils
 
 class ImageClassifierTrainer():
-    def __init__(self, model, optimizer, loss_func, max_epochs, train_loader, valid_loader):
+    def __init__(self, model, optimizer, loss_func, max_epochs, train_loader, valid_loader, print_freq):
         """
         This method initializes a trainer class.
         """
@@ -17,15 +17,22 @@ class ImageClassifierTrainer():
         """
         This method turns on GPU processing if available on the local device.
         """
-        if torch.backends.mps.is_available(): # Check for MPS (Metal Performance Shaders) on M1
+            
+        if torch.cuda.is_available() and torch.cuda.device_count() > 1: # Check for multiple CUDA GPUs
+            device = torch.device("cuda")
+            self.model = torch.nn.DataParallel(self.model.to(device))
+            print(f"Using {torch.cuda.device_count()} CUDA GPUs.")
+
+        elif torch.cuda.is_available(): # Check for a single CUDA GPU
+            device = torch.device("cuda")
+            self.model = self.model.to(device)
+            print("Using a Single CUDA GPU.")
+
+        elif torch.backends.mps.is_available(): # Check for MPS (Metal Performance Shaders) on M1
             device = torch.device("mps")
             self.model = self.model.to(device)
             print("Using MPS.")
-            
-        elif torch.cuda.is_available(): # Check for CUDA for other devices
-            device = torch.device("cuda")
-            print("Using CUDA.")
-            
+
         else:
             device = torch.device("cpu")
             self.model = self.model.to(device)
@@ -70,9 +77,9 @@ class ImageClassifierTrainer():
             losses.update(loss.item(), inputs.size(0))
             top1.update(prec1.item(), inputs.size(0))
 
-            if idx % 10 == 0:
+            if idx % self.print_freq == 0:
                 # Print the training batch idx and performance metrics
-                print(f': [{epoch}, {idx}/{len(self.train_loader)}]\t'
+                print(f'Train: [{epoch}, {idx}/{len(self.train_loader)}]\t'
                       f'Loss {losses.value:.4f} ({losses.avg:.4f})\t'
                       f'Batch Top@1 Accuracy {top1.value:.3f} ({top1.avg:.3f})')
 
@@ -106,13 +113,13 @@ class ImageClassifierTrainer():
                 losses.update(loss.item(), inputs.size(0))
                 top1.update(prec1.item(), inputs.size(0))
     
-                if idx % 10 == 0:
+                if idx % self.print_freq == 0:
                     # Print the testing batch idx, performance metrics and their moving averages
-                    print(f'Test: [{idx}/{len(self.valid_loader)}]\t'
+                    print(f'Valid: [{idx}/{len(self.valid_loader)}]\t'
                           f'Loss {losses.value:.4f} ({losses.avg:.4f})\t'
                           f'Batch Top@1 Accuracy {top1.value:.3f} ({top1.avg:.3f})')
 
-        return top1.avg # Average accuracy of whole dataset
+        return top1.avg # Average accuracy of across whole testing dataset
 
     def fit(self):
         """
