@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "neuralnets"
+version = "0.1.0"
+description = ""
+authors = ["Theo Obadiah Teguh <theo.obadiah@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.14"
+pandas = "^2.3.1"
+numpy = "^2.3.2"
+scikit-learn = "^1.7.1"
+torch = "^2.8.0"
+lightning = "^2.5.2"
+jupyter = "^1.1.1"
+import-ipynb = "^0.2"
+torchvision = "^0.23.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
