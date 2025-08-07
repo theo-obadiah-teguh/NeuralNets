@@ -63,14 +63,14 @@ class ImageClassifierTrainer():
             self.optimizer.step()
 
             # Calculate precision
-            prec1 = utils.top_k_accuracy(outputs, labels, k=1)
+            prec1 = utils.top_k_accuracy(outputs, labels.to(device), k=1)
 
             # Update perfomance trackers
             # Note that the moving avg should be proportional to the size of the batch
             losses.update(loss.item(), inputs.size(0))
             top1.update(prec1.item(), inputs.size(0))
 
-            if idx % 200 == 0:
+            if idx % 10 == 0:
                 # Print the training batch idx and performance metrics
                 print(f': [{epoch}, {idx}/{len(self.train_loader)}]\t'
                       f'Loss {losses.value:.4f} ({losses.avg:.4f})\t'
@@ -99,14 +99,14 @@ class ImageClassifierTrainer():
                 loss = self.loss_func(outputs, labels.to(device))
     
                 # Calculate precision
-                prec1 = utils.top_k_accuracy(outputs, labels, k=1)
+                prec1 = utils.top_k_accuracy(outputs, labels.to(device), k=1)
     
                 # Update perfomance trackers
                 # Note that the moving avg should be proportional to the size of the batch
                 losses.update(loss.item(), inputs.size(0))
                 top1.update(prec1.item(), inputs.size(0))
     
-                if idx % 200 == 0:
+                if idx % 10 == 0:
                     # Print the testing batch idx, performance metrics and their moving averages
                     print(f'Test: [{idx}/{len(self.valid_loader)}]\t'
                           f'Loss {losses.value:.4f} ({losses.avg:.4f})\t'

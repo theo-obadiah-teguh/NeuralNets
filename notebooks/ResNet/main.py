@@ -15,7 +15,7 @@ import torch.nn as nn # For loss function
 
 def main():
     # --- Configuration (Hardcoded for MVP) ---
-    model_name = 'resnet32'
+    model_name = 'resnet56'
     batch_size = 128
     epochs = 10 # Reduced for quick MVP test
     learning_rate = 0.1
@@ -28,10 +28,14 @@ def main():
     # Note: The original uses DataParallel, omitted for simplicity in MVP
     # model = torch.nn.DataParallel(model)
 
+
     # --- 2. Data ---
-    print("Setting up data loaders...")
     data_loader = CIFAR10DataLoader(batch_size=batch_size)
+
+    print("Downloading dataset...")
     data_loader.setup_datasets()
+
+    print("Setting up data loaders...")
     train_loader, valid_loader = data_loader.get_loaders()
 
     # --- 3. Loss, Optimizer ---

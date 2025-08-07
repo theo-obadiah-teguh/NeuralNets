@@ -63,6 +63,6 @@ class CIFAR10DataLoader():
         """
         Returns both training and validation loaders in a tuple for easy unpacking.
         """
-        return self.get_train_loader(self), self.get_valid_loader(self)
+        return self.get_train_loader(), self.get_valid_loader()
 
     
