@@ -52,13 +52,16 @@ def main():
     # Note: Learning rate scheduler omitted for MVP
 
     # --- 4. Training and Saving the Model ---
+    start_epoch = 1
     trainer = ImageClassifierTrainer(model,
                                      optimizer,
                                      criterion,
+                                     start_epoch,
                                      args.epochs,
                                      train_loader,
                                      valid_loader,
-                                     args.print_freq)
+                                     args.print_freq,
+                                     args.save_freq)
     trainer.fit()
 
     print("MVP Training Completed.")
