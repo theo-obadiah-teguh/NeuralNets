@@ -19,9 +19,11 @@ import argparse
 # Define an argument parser
 parser = argparse.ArgumentParser(description='CIFAR-10 ResNet Trainer')
 parser.add_argument('-a', '--aarch', dest='model_name', default='resnet32')
-parser.add_argument('-e', '--epochs', dest='epochs', default=10)
+parser.add_argument('-e', '--epochs', dest='epochs', default=200)
 parser.add_argument('-m', '--momentum', dest='momentum', default=0.9)
 parser.add_argument('-w', '--workers', dest='workers', default=2)
+# parser.add_argument('-r', '--resume', dest='resume', default=False)
+parser.add_argument('-sf', '--save-freq', dest='save_freq', default=10)
 parser.add_argument('-pf', '--print-freq', dest='print_freq', default=50)
 parser.add_argument('-bs', '--batch-size', dest='batch_size', default=128)
 parser.add_argument('-wd', '--weight-decay', dest='weight_decay', default=1e-4)
@@ -40,7 +42,7 @@ def main():
     data_loader.setup_datasets()
     train_loader, valid_loader = data_loader.get_loaders()
 
-    # --- 3. Loss, Optimizer ---
+    # --- 3. Loss, Optimizer, Learning Rate Scheduler ---
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(),
                           args.learning_rate,
@@ -49,9 +51,14 @@ def main():
     
     # Note: Learning rate scheduler omitted for MVP
 
-    # --- 4. Training
-    trainer = ImageClassifierTrainer(model, 
-    optimizer, criterion, args.epochs, train_loader, valid_loader, args.print_freq)
+    # --- 4. Training and Saving the Model ---
+    trainer = ImageClassifierTrainer(model,
+                                     optimizer,
+                                     criterion,
+                                     args.epochs,
+                                     train_loader,
+                                     valid_loader,
+                                     args.print_freq)
     trainer.fit()
 
     print("MVP Training Completed.")

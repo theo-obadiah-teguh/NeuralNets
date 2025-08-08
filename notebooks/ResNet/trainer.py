@@ -2,18 +2,22 @@ import torch
 import utils
 
 class ImageClassifierTrainer():
-    def __init__(self, model, optimizer, loss_func, max_epochs, train_loader, valid_loader, print_freq):
+    def __init__(self, model, optimizer, loss_func, start_epoch, max_epochs, train_loader, valid_loader, print_freq, save_freq):
         """
         This method initializes a trainer class.
         """
         self.model = model
         self.optimizer = optimizer
         self.loss_func = loss_func
+        self.start_epoch = start_epoch
         self.max_epochs = max_epochs
         self.train_loader = train_loader
         self.valid_loader = valid_loader
+        self.print_freq = print_freq
+        self.save_freq = save_freq
+        self.best_prec1 = 0
         
-    def enable_parallel_processing(self):
+    def _enable_parallel_processing(self):
         """
         This method turns on GPU processing if available on the local device.
         """
@@ -125,9 +129,33 @@ class ImageClassifierTrainer():
         """
         Full training loop, with validation for every epoch of training.
         """
-        self.enable_parallel_processing()
+        self._enable_parallel_processing()
         
-        for epoch in range(1, self.max_epochs + 1):
+        for epoch in range(self.start_epoch, self.max_epochs + 1):
             self.train_epoch(epoch)
             prec1 = self.validate()
+
+            is_best = prec1 > self.best_prec1
+            self.best_prec1 = max(prec1, self.best_prec1)
+
+            # Save a checkpoint every 'save_freq' epochs
+            if epoch % self.save_freq == 0:
+                self._save_model({'epoch': epoch + 1, # Save the next epoch to resume training
+                                  'is_best': is_best, # Save whether or not this is the best model
+                                  'state_dict': self.model.state_dict(),
+                                  'optimizer_state_dict': self.optimizer.state_dict()
+                                  }, filename='checkpoint.pth')
+                
+            # Always overwrite with the latest best model
+            if is_best: 
+                self._save_model({'state_dict': self.model.state_dict()
+                                  }, filename='model.pth')
+
+    def _save_model(self, state, filename):
+        """
+        Method to save the model checkpoint during training.
+        """
+        torch.save(state, filename)
+
+
 
