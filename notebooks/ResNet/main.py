@@ -19,15 +19,15 @@ import argparse
 # Define an argument parser
 parser = argparse.ArgumentParser(description='CIFAR-10 ResNet Trainer')
 parser.add_argument('-a', '--aarch', dest='model_name', default='resnet32')
-parser.add_argument('-e', '--epochs', dest='epochs', default=200)
-parser.add_argument('-m', '--momentum', dest='momentum', default=0.9)
-parser.add_argument('-w', '--workers', dest='workers', default=2)
-# parser.add_argument('-r', '--resume', dest='resume', default=False)
-parser.add_argument('-sf', '--save-freq', dest='save_freq', default=10)
-parser.add_argument('-pf', '--print-freq', dest='print_freq', default=50)
-parser.add_argument('-bs', '--batch-size', dest='batch_size', default=128)
-parser.add_argument('-wd', '--weight-decay', dest='weight_decay', default=1e-4)
-parser.add_argument('-lr', '--learning-rate', dest='learning_rate', default=0.1)
+parser.add_argument('-e', '--epochs', dest='epochs', type=int, default=200)
+parser.add_argument('-m', '--momentum', dest='momentum', type=float, default=0.9)
+parser.add_argument('-w', '--workers', dest='workers', type=int, default=2)
+parser.add_argument('-r', '--resume', type=str, default='')
+parser.add_argument('-sf', '--save-freq', dest='save_freq', type=int, default=2)
+parser.add_argument('-pf', '--print-freq', dest='print_freq', type=int, default=50)
+parser.add_argument('-bs', '--batch-size', dest='batch_size', type=int, default=128)
+parser.add_argument('-wd', '--weight-decay', dest='weight_decay', type=float, default=1e-4)
+parser.add_argument('-lr', '--learning-rate', dest='learning_rate', type=float, default=0.1)
 
 # Get all arguments from the command line
 args = parser.parse_args()
@@ -49,12 +49,27 @@ def main():
                           momentum=args.momentum,
                           weight_decay=args.weight_decay)
     
-    # Note: Learning rate scheduler omitted for MVP
+    # Get the number of training batches per epoch
+    num_batches = len(train_loader)
+
+    # Calculate epoch milestones for ResNet-style scheduling
+    epoch_milestones = [
+        32000 // num_batches,  # Epoch when 32k iterations occur
+        48000 // num_batches   # Epoch when 48k iterations occur
+    ]
+
+    # Create learning rate scheduler
+    lr_scheduler = optim.lr_scheduler.MultiStepLR(
+        optimizer, 
+        milestones=epoch_milestones, 
+        gamma=0.1 # Divide learning rate by 10 at any of these milestones
+    )
 
     # --- 4. Training and Saving the Model ---
     start_epoch = 1
     trainer = ImageClassifierTrainer(model,
                                      optimizer,
+                                     lr_scheduler,
                                      criterion,
                                      start_epoch,
                                      args.epochs,
@@ -64,7 +79,7 @@ def main():
                                      args.save_freq)
     trainer.fit()
 
-    print("MVP Training Completed.")
+    print("Training Completed.")
 
 if __name__ == '__main__':
     main()

@@ -2,12 +2,13 @@ import torch
 import utils
 
 class ImageClassifierTrainer():
-    def __init__(self, model, optimizer, loss_func, start_epoch, max_epochs, train_loader, valid_loader, print_freq, save_freq):
+    def __init__(self, model, optimizer, scheduler, loss_func, start_epoch, max_epochs, train_loader, valid_loader, print_freq, save_freq):
         """
         This method initializes a trainer class.
         """
         self.model = model
         self.optimizer = optimizer
+        self.scheduler = scheduler
         self.loss_func = loss_func
         self.start_epoch = start_epoch
         self.max_epochs = max_epochs
@@ -81,9 +82,9 @@ class ImageClassifierTrainer():
             losses.update(loss.item(), inputs.size(0))
             top1.update(prec1.item(), inputs.size(0))
 
-            if idx % self.print_freq == 0:
+            if idx % self.print_freq == 0 or idx == len(self.train_loader) - 1:
                 # Print the training batch idx and performance metrics
-                print(f'Train: [{epoch}, {idx}/{len(self.train_loader)}]\t'
+                print(f'Train: [{epoch}, {idx}/{len(self.train_loader) - 1}]\t'
                       f'Loss {losses.value:.4f} ({losses.avg:.4f})\t'
                       f'Batch Top@1 Accuracy {top1.value:.3f} ({top1.avg:.3f})')
 
@@ -117,12 +118,13 @@ class ImageClassifierTrainer():
                 losses.update(loss.item(), inputs.size(0))
                 top1.update(prec1.item(), inputs.size(0))
     
-                if idx % self.print_freq == 0:
+                if idx % self.print_freq == 0 or idx == len(self.valid_loader) - 1:
                     # Print the testing batch idx, performance metrics and their moving averages
-                    print(f'Valid: [{idx}/{len(self.valid_loader)}]\t'
+                    print(f'Valid: [{idx}/{len(self.valid_loader) - 1}]\t'
                           f'Loss {losses.value:.4f} ({losses.avg:.4f})\t'
                           f'Batch Top@1 Accuracy {top1.value:.3f} ({top1.avg:.3f})')
-
+        
+        print(f'Epoch Top@1 Accuracy ({top1.avg:.3f})\n')
         return top1.avg # Average accuracy of across whole testing dataset
 
     def fit(self):
@@ -132,9 +134,16 @@ class ImageClassifierTrainer():
         self._enable_parallel_processing()
         
         for epoch in range(self.start_epoch, self.max_epochs + 1):
+            print(f'Current LR: {self.optimizer.param_groups[0]['lr']}')
             self.train_epoch(epoch)
+
+            # Validate training after epoch
             prec1 = self.validate()
 
+            # Update learning rate after epoch is completed
+            self.scheduler.step()
+
+            # Check if this is the best model, and save the best precision
             is_best = prec1 > self.best_prec1
             self.best_prec1 = max(prec1, self.best_prec1)
 
@@ -156,6 +165,4 @@ class ImageClassifierTrainer():
         Method to save the model checkpoint during training.
         """
         torch.save(state, filename)
-
-
 
