@@ -138,7 +138,7 @@ class ImageClassifierTrainer():
             self.train_epoch(epoch)
 
             # Validate training after epoch is completed
-            prec1 = self.validate()
+            prec1 = self.validate(epoch)
 
             # Update learning rate after epoch is completed
             self.scheduler.step()
