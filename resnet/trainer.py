@@ -134,7 +134,7 @@ class ImageClassifierTrainer():
         self._enable_parallel_processing()
         
         for epoch in range(self.start_epoch, self.max_epochs + 1):
-            print(f'Current LR: {self.optimizer.param_groups[0]['lr']}')
+            print(f'Current LR: {self.optimizer.param_groups[0]["lr"]}')
             self.train_epoch(epoch)
 
             # Validate training after epoch is completed
