@@ -7,7 +7,7 @@ A repository containing ANN implementations with PyTorch, starting out from the 
 | Model Name  | Parameters | Top-1 Accuracy |
 |-------------|------------|----------------|
 | resnet-20   | 0.27M      | 91.47%         |
-| resnet-32   | 0.46M      | %              |
+| resnet-32   | 0.46M      | 92.32%         |
 | resnet-44   | 0.66M      | %              |
 | resnet-56   | 0.85M      | %              |
 | resnet-110  | 1.7M       | %              |
