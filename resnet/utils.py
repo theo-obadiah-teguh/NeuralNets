@@ -68,3 +68,34 @@ def multiple_top_k_accuracy(output, target, K=(1,)):
     return results
     
         
+def eval(model, valid_loader, loss_func):
+    """
+    This method assesses a given model's performance on a testing set.
+    Note: The model should be in evaluation mode, so that Batch-Normalization and Dropout layers aren't updated.
+    """
+    print(f'Evaluating Model on Training Set...')
+
+    losses = AverageMeter()
+    top1 = AverageMeter()
+    
+    model.eval() # Model should be in evaluation mode
+
+    # Disable gradient computation, because Autograd generates gradients in a forward pass
+    # This should speed up computation
+    with torch.no_grad():
+        for idx, (inputs, labels) in enumerate(valid_loader):
+            # Note that the trainloader consists of [idx, (input, label)] "rows"
+            # Make predictions, and calculate loss (forward prop)
+            outputs = model(inputs)
+            loss = loss_func(outputs, labels)
+
+            # Calculate precision
+            prec1 = top_k_accuracy(outputs, labels, k=1)
+
+            # Update perfomance trackers
+            # Note that the moving avg should be proportional to the size of the batch
+            losses.update(loss.item(), inputs.size(0))
+            top1.update(prec1.item(), inputs.size(0))
+    
+    print(f'Model Accuracy on Test Set: {top1.avg:.3f}%\n')
+    return top1.avg
