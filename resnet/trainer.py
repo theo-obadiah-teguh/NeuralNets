@@ -152,12 +152,14 @@ class ImageClassifierTrainer():
                 self._save_model({'epoch': epoch + 1, # Save the next epoch to resume training
                                   'is_best': is_best, # Save whether or not this is the best model
                                   'state_dict': self.model.state_dict(),
+                                  'prec1': prec1,
                                   'optimizer_state_dict': self.optimizer.state_dict()
                                   }, filename='checkpoint.pth')
                 
             # Always overwrite with the latest best model
             if is_best: 
-                self._save_model({'state_dict': self.model.state_dict()
+                self._save_model({'state_dict': self.model.state_dict(),
+                                  'prec1': self.best_prec1,
                                   }, filename='model.pth')
 
     def _save_model(self, state, filename):
