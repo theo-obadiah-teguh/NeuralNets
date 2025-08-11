@@ -137,7 +137,7 @@ class ImageClassifierTrainer():
             print(f'Current LR: {self.optimizer.param_groups[0]['lr']}')
             self.train_epoch(epoch)
 
-            # Validate training after epoch
+            # Validate training after epoch is completed
             prec1 = self.validate()
 
             # Update learning rate after epoch is completed

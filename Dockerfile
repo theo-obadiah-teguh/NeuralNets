@@ -10,7 +10,7 @@ COPY requirements.txt /requirements.txt
 # Run this before you copy notebooks, to use the layer caching system
 # Note: Cached installation is not needed for Docker 
 # (https://stackoverflow.com/questions/45594707/what-is-pips-no-cache-dir-good-for)
-RUN pip install --no-cache-dir -r requirements.txt jupyterlab
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Note: We don't need to copy everything from notebooks, as we use bind mounts
 # Expose the JupyterLab port

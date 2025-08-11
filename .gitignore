@@ -1,3 +1,3 @@
 .venv
-notebooks/ResNet/data
-notebooks/ResNet/__pycache__
+resnet/data
+resnet/__pycache__
