@@ -19,13 +19,13 @@ import argparse
 # Define an argument parser
 parser = argparse.ArgumentParser(description='CIFAR-10 ResNet Trainer')
 parser.add_argument('-a', '--aarch', dest='model_name', default='resnet32')
-parser.add_argument('-e', '--epochs', dest='epochs', type=int, default=200)
+parser.add_argument('-e', '--epochs', dest='epochs', type=int, default=164) # Paper terminates training at 64K iterations, i.e 164 epochs
 parser.add_argument('-m', '--momentum', dest='momentum', type=float, default=0.9)
 parser.add_argument('-w', '--workers', dest='workers', type=int, default=2)
 parser.add_argument('-r', '--resume', type=str, default='')
 parser.add_argument('-sf', '--save-freq', dest='save_freq', type=int, default=2)
 parser.add_argument('-pf', '--print-freq', dest='print_freq', type=int, default=50)
-parser.add_argument('-bs', '--batch-size', dest='batch_size', type=int, default=128)
+parser.add_argument('-bs', '--batch-size', dest='batch_size', type=int, default=128) # Paper uses 128 batch size
 parser.add_argument('-wd', '--weight-decay', dest='weight_decay', type=float, default=1e-4)
 parser.add_argument('-lr', '--learning-rate', dest='learning_rate', type=float, default=0.1)
 

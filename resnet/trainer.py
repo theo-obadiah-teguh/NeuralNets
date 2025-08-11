@@ -88,7 +88,7 @@ class ImageClassifierTrainer():
                       f'Loss {losses.value:.4f} ({losses.avg:.4f})\t'
                       f'Batch Top@1 Accuracy {top1.value:.3f} ({top1.avg:.3f})')
 
-    def validate(self):
+    def validate(self, epoch):
         """
         This method assesses model performance, i.e. it goes through the whole dataset.
         Note: The model should be in evaluation mode, so that Batch-Normalization and Dropout layers aren't updated.
@@ -120,7 +120,7 @@ class ImageClassifierTrainer():
     
                 if idx % self.print_freq == 0 or idx == len(self.valid_loader) - 1:
                     # Print the testing batch idx, performance metrics and their moving averages
-                    print(f'Valid: [{idx}/{len(self.valid_loader) - 1}]\t'
+                    print(f'Valid: [{epoch}, {idx}/{len(self.valid_loader) - 1}]\t'
                           f'Loss {losses.value:.4f} ({losses.avg:.4f})\t'
                           f'Batch Top@1 Accuracy {top1.value:.3f} ({top1.avg:.3f})')
         
