@@ -46,6 +46,7 @@ def top_k_accuracy(output, target, k):
     # Indices is now a matrix of shape (batch_size x k)
 
     # Check if target is in top-k predictions for each sample
+    # Note that the target/label is just 0-9
     # target.unsqueeze(1) converts [batch_size] to [batch_size, 1] for broadcasting
     # torch.eq() performs element-wise equality comparison between two tensors.
     correct = torch.eq(indices, target.unsqueeze(1)).any(dim=1)
@@ -83,7 +84,7 @@ def eval(model, valid_loader, loss_func):
     # Disable gradient computation, because Autograd generates gradients in a forward pass
     # This should speed up computation
     with torch.no_grad():
-        for idx, (inputs, labels) in enumerate(valid_loader):
+        for _, (inputs, labels) in enumerate(valid_loader):
             # Note that the trainloader consists of [idx, (input, label)] "rows"
             # Make predictions, and calculate loss (forward prop)
             outputs = model(inputs)
